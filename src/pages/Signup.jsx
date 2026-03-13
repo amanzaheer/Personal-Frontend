@@ -1,5 +1,6 @@
 import React from "react";
-import { BookOpen } from "lucide-react";
+import { Link } from "react-router-dom";
+import { BookOpen, ArrowLeft } from "lucide-react";
 import SignupForm from "../components/auth/SignupForm";
 
 export default function Signup() {
@@ -27,18 +28,27 @@ export default function Signup() {
         className="flex-1 flex flex-col min-h-screen lg:min-h-0 relative bg-cover bg-no-repeat bg-right"
         style={{ backgroundImage: "url(/img/Vector.png)" }}
       >
-        <div className="shrink-0 flex items-center gap-3 p-4 md:p-6 lg:p-8">
-          <div className="h-10 w-10 md:h-12 md:w-12 rounded-xl bg-accent text-accent-foreground flex items-center justify-center brand-glow shrink-0">
-            <BookOpen className="w-5 h-5 md:w-7 md:h-7" strokeWidth={1.5} />
+        <div className="shrink-0 flex items-center justify-between gap-3 p-4 md:p-6 lg:p-8">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 md:h-12 md:w-12 rounded-xl bg-accent text-accent-foreground flex items-center justify-center brand-glow shrink-0">
+              <BookOpen className="w-5 h-5 md:w-7 md:h-7" strokeWidth={1.5} />
+            </div>
+            <div>
+              <p className="font-display text-2xl md:text-4xl font-semibold text-foreground tracking-tight">
+                NAA World
+              </p>
+              <p className="text-xs md:text-sm text-muted-foreground mt-0.5">
+                Writer • Publisher • Novels
+              </p>
+            </div>
           </div>
-          <div>
-            <p className="font-display text-2xl md:text-4xl font-semibold text-foreground tracking-tight">
-              NAA World
-            </p>
-            <p className="text-xs md:text-sm text-muted-foreground mt-0.5">
-              Writer • Publisher • Novels
-            </p>
-          </div>
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back to home
+          </Link>
         </div>
         <div className="flex-1 flex items-center justify-center p-4 md:p-6 lg:p-8 pt-0 md:pt-0 lg:pt-0 bg-gradient-to-b from-muted/30 to-background lg:bg-transparent">
           <div className="w-full max-w-xl">

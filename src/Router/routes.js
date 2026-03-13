@@ -9,7 +9,6 @@ import { MembershipPage } from "../pages/Placeholder";
 import Sliders from "../pages/Sliders";
 import Books from "../pages/Books";
 import Gallery from "../pages/Gallery";
-import WebsiteConfiguration from "../pages/WebsiteConfiguration";
 import Payments from "../pages/Payments";
 import BookSubscription from "../pages/BookSubscription";
 
@@ -80,11 +79,5 @@ export const routes = [
     element: Users,
     permission: "view_all_users",
     pageTitle: "Users",
-  },
-  {
-    path: "/website-config",
-    element: WebsiteConfiguration,
-    permission: "",
-    pageTitle: "Website Configuration",
   },
 ];

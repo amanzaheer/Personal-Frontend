@@ -6,7 +6,6 @@ import {
   ImageIcon,
   LayoutGrid,
   Wallet,
-  Globe,
   LayoutDashboard,
 } from "lucide-react";
 
@@ -63,12 +62,6 @@ export const menu = [
         Icon: LayoutGrid,
         title: "Sliders",
         to: "/sliders",
-        permission: "",
-      },
-      {
-        Icon: Globe,
-        title: "Website Config",
-        to: "/website-config",
         permission: "",
       },
     ],
