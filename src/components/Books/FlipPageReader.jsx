@@ -14,7 +14,7 @@ const YIELD_MS = 16; // Yield to main thread between pages to keep UI responsive
 
 const delay = (ms) => new Promise((r) => setTimeout(r, ms));
 
-export default function FlipPageReader({ pdfUrl, title = "Book", onClose, embedded = false }) {
+export default function FlipPageReader({ pdfUrl, title = "Book", onClose, onReady, embedded = false }) {
   const [pageImages, setPageImages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingProgress, setLoadingProgress] = useState({ current: 0, total: 0 });
@@ -72,7 +72,10 @@ export default function FlipPageReader({ pdfUrl, title = "Book", onClose, embedd
           setPageImages([]);
         }
       } finally {
-        if (!cancelled) setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+          onReady?.();
+        }
       }
     };
 

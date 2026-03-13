@@ -14,9 +14,6 @@ function buildImageUrl(image) {
   if (!image || typeof image !== "string") return null;
   if (image.startsWith("http://") || image.startsWith("https://")) return image;
   const path = image.startsWith("/") ? image.slice(1) : image;
-  if (path.startsWith("uploads/")) {
-    return `/${path}`;
-  }
   const base = uploadsBaseURL
     ? uploadsBaseURL.endsWith("/")
       ? uploadsBaseURL.slice(0, -1)

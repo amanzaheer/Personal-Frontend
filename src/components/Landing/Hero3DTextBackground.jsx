@@ -1,6 +1,6 @@
 import React, { useRef, useMemo, Suspense } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Text3D, Float, useScroll } from "@react-three/drei";
+import { Text3D, Float } from "@react-three/drei";
 
 const FONT_URL =
   "https://unpkg.com/three@0.160.0/examples/fonts/helvetiker_regular.typeface.json";

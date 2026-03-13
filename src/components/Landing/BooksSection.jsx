@@ -120,6 +120,7 @@ export default function BooksSection() {
       sessionStorage.getItem("auth_token");
 
     setReadingBookId(id);
+    let didOpenReader = false;
     try {
       const base = apiBaseURL.endsWith("/api")
         ? apiBaseURL
@@ -142,6 +143,7 @@ export default function BooksSection() {
           url: fullUrl,
           title: book?.title || "Book",
         });
+        didOpenReader = true;
       } else {
         const msg =
           json?.message || json?.data?.message || "Membership required";
@@ -186,7 +188,7 @@ export default function BooksSection() {
         );
       }
     } finally {
-      setReadingBookId(null);
+      if (!didOpenReader) setReadingBookId(null);
     }
   };
 
@@ -200,7 +202,11 @@ export default function BooksSection() {
         <FlipPageReader
           pdfUrl={readerModal.url}
           title={readerModal.title}
-          onClose={() => setReaderModal({ open: false, url: null, title: "" })}
+          onClose={() => {
+            setReaderModal({ open: false, url: null, title: "" });
+            setReadingBookId(null);
+          }}
+          onReady={() => setReadingBookId(null)}
           embedded={false}
         />
       )}

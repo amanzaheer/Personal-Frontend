@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { getWebsiteConfig, isSectionEnabled } from "../../lib/websiteConfig";
 import { Instagram } from "lucide-react";
-import Hero3DTextBackground from "./Hero3DTextBackground";
+// 3D banner disabled until React 19 or R3F v8 is confirmed installed (was causing "reading 'S' of undefined")
+// import Hero3DTextBackground from "./Hero3DTextBackground";
 
 const DEFAULT_HERO = {
   greeting: "Hello, I'm",
@@ -64,8 +65,8 @@ export default function HomeBanner() {
       id="hero-section"
       className="min-h-screen flex flex-col bg-[#fdfbfb] relative"
     >
-      {/* 3D typography background - scroll-driven */}
-      <Hero3DTextBackground primaryColor={primaryColor} />
+      {/* 3D typography background - disabled (see import above) */}
+      {/* <Hero3DTextBackground primaryColor={primaryColor} /> */}
       {/* Vector.png background */}
       <div
         className="fixed inset-0 pointer-events-none bg-cover bg-no-repeat bg-center bg-[#fdfbfb] z-[1]"
