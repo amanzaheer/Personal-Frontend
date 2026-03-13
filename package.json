@@ -1,0 +1,51 @@
+{
+  "name": "my-project",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@hookform/resolvers": "^5.2.2",
+    "@radix-ui/react-slot": "^1.2.4",
+    "@react-three/drei": "^10.7.7",
+    "@react-three/fiber": "^9.5.0",
+    "@stripe/react-stripe-js": "^2.9.0",
+    "@stripe/stripe-js": "^4.10.0",
+    "@tailwindcss/vite": "^4.1.14",
+    "axios": "^1.13.2",
+    "class-variance-authority": "^0.7.1",
+    "dayjs": "^1.11.19",
+    "lodash.isequal": "^4.5.0",
+    "lucide-react": "^0.488.0",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "react-hook-form": "^7.66.0",
+    "react-hot-toast": "^2.6.0",
+    "react-icons": "5.5.0",
+    "react-is": "^19.2.4",
+    "react-markdown": "^10.1.0",
+    "react-pageflip": "^2.0.3",
+    "react-pdf": "^10.4.1",
+    "react-router-dom": "^6.30.1",
+    "recharts": "^3.8.0",
+    "tailwind-merge": "^3.4.0",
+    "tailwindcss": "^4.1.14",
+    "three": "^0.183.2",
+    "yup": "^1.7.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.36.0",
+    "@vitejs/plugin-basic-ssl": "^2.1.4",
+    "@vitejs/plugin-react": "^5.0.4",
+    "eslint": "^9.36.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.22",
+    "globals": "^16.4.0",
+    "vite": "^7.1.7"
+  }
+}

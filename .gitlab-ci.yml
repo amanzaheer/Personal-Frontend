@@ -1,0 +1,65 @@
+stages:
+  - install
+  - build
+  - deploy
+
+install:
+  stage: install
+  tags:
+    - dcrunner
+  only:
+    - dev
+  cache:
+    key: $CI_COMMIT_REF_SLUG
+    paths:
+      - node_modules/
+  script:
+    - yarn install --frozen-lockfile
+
+build:
+  stage: build
+  tags:
+    - dcrunner
+  only:
+    - dev
+  cache:
+    key: $CI_COMMIT_REF_SLUG
+    paths:
+      - node_modules/
+    policy: pull
+  before_script:
+    - export NODE_OPTIONS="--max-old-space-size=3072"
+  script:
+    - echo "Building deploy package"
+    - yarn build
+    - echo "Build successful"
+  artifacts:
+    expire_in: 1 hour
+    paths:
+      - dist
+
+deploy:
+  stage: deploy
+  tags:
+    - dcrunner
+  only:
+    - dev
+  environment:
+    name: development
+  before_script:
+    - apt-get update -qy
+    - apt-get install -y openssh-client
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - ssh-keyscan $SERVERIP >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+  script:
+    - ssh $SSH_USER@$SERVERIP "sudo rm -rf $DEV_DEST_DIR/*"
+    - scp -r dist/* $SSH_USER@$SERVERIP:$DEV_DEST_DIR/
+    - ssh $SSH_USER@$SERVERIP "sudo chown -R www-data:www-data $DEV_DEST_DIR && sudo chmod -R 775 $DEV_DEST_DIR"
+    - ssh $SSH_USER@$SERVERIP "sudo systemctl restart nginx"
+    - echo "Deployed successfully"
+  after_script:
+    - rm -rf $CI_PROJECT_DIR/*
