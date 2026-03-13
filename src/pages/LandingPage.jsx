@@ -10,16 +10,20 @@ import GallerySection from "../components/Landing/GallerySection";
 const stripePublicKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || "";
 const stripePromise = stripePublicKey ? loadStripe(stripePublicKey) : null;
 
+const pageContent = (
+  <div className="min-h-screen flex flex-col bg-white relative">
+    <LandingHeader />
+    <HomeBanner />
+    <ProfessionalIdentitySection />
+    <BooksSection />
+    <GallerySection />
+  </div>
+);
+
 export default function LandingPage() {
-  return (
-    <Elements stripe={stripePromise}>
-      <div className="min-h-screen flex flex-col bg-white relative">
-        <LandingHeader />
-        <HomeBanner />
-        <ProfessionalIdentitySection />
-        <BooksSection />
-        <GallerySection />
-      </div>
-    </Elements>
-  );
+  // Only wrap with Elements when Stripe key is set; otherwise Stripe lib crashes with stripe={null}
+  if (stripePromise) {
+    return <Elements stripe={stripePromise}>{pageContent}</Elements>;
+  }
+  return pageContent;
 }
