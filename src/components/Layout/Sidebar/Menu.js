@@ -5,7 +5,6 @@ import {
   BookOpen,
   ImageIcon,
   LayoutGrid,
-  Wallet,
   LayoutDashboard,
   Footprints,
 } from "lucide-react";
@@ -18,13 +17,7 @@ export const menu = [
     permission: "",
     disabled: false,
   },
-  {
-    Icon: Wallet,
-    title: "Membership",
-    to: "/membership",
-    permission: "",
-    disabled: false,
-  },
+
   {
     Icon: CreditCard,
     title: "Payment",

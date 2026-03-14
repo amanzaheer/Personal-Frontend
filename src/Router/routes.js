@@ -34,12 +34,6 @@ export const routes = [
   },
 
   {
-    path: "/membership",
-    element: MembershipPage,
-    permission: "",
-    pageTitle: "Membership",
-  },
-  {
     path: "/payment",
     element: Payments,
     permission: "",
