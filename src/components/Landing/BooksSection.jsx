@@ -15,7 +15,7 @@ function buildImageUrl(image) {
   if (!image || typeof image !== "string") return null;
   if (image.startsWith("http://") || image.startsWith("https://")) return image;
   const path = image.startsWith("/") ? image.slice(1) : image;
-  if (path.startsWith("uploads/")) return `/${path}`;
+  if (!path) return null;
   const base = uploadsBaseURL
     ? uploadsBaseURL.endsWith("/")
       ? uploadsBaseURL.slice(0, -1)
@@ -31,7 +31,6 @@ function buildAssetUrl(path) {
   const p = path.replace(/^\/+/, "");
   if (!p) return null;
   if (path.startsWith("http")) return path;
-  if (p.startsWith("uploads/")) return `/${p}`;
   const base =
     uploadsBaseURL ||
     (typeof window !== "undefined" ? window.location.origin : "");
@@ -266,7 +265,7 @@ export default function BooksSection() {
           {/* Books grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 md:gap-10">
             {books.map((book, index) => {
-              const coverUrl = buildImageUrl(book?.coverImage);
+              const coverUrl = buildImageUrl(book?.coverImage || book?.coverimage);
               const isPaid = book?.isPaid === true || book?.isPaid === "true";
               const bookId = book._id || book.id;
               const showCover = coverUrl && !imgErrors.has(bookId);

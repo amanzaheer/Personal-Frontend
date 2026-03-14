@@ -287,7 +287,7 @@ export default function Books() {
       price: book.price ?? 0,
     });
     setCoverImageFile(null);
-    const coverPath = book.coverImage;
+    const coverPath = book.coverImage || book.coverimage;
     if (coverPath && coverPath.trim()) {
       const imgUrl = coverPath.startsWith("http")
         ? coverPath
@@ -408,8 +408,10 @@ export default function Books() {
       : `/${p}`;
   };
 
-  const getCoverImageUrl = (book) => buildAssetUrl(book?.coverImage);
-  const getBookFileUrl = (book) => buildAssetUrl(book?.bookFile);
+  const getCoverImageUrl = (book) =>
+    buildAssetUrl(book?.coverImage || book?.coverimage);
+  const getBookFileUrl = (book) =>
+    buildAssetUrl(book?.bookFile || book?.bookfile);
 
   const openViewModal = (book) => {
     setBookToView(book);
