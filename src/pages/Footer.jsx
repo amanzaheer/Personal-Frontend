@@ -15,6 +15,7 @@ import {
   Eye,
   Pencil,
 } from "lucide-react";
+import { buildUploadUrl } from "../lib/uploadUrl";
 
 const SOCIAL_NAMES = [
   "whatsapp",
@@ -28,17 +29,8 @@ const SOCIAL_NAMES = [
   "other",
 ];
 
-function buildAssetUrl(path, uploadsBaseURL) {
-  if (!path || typeof path !== "string") return null;
-  const trimmed = path.trim();
-  if (!trimmed || !uploadsBaseURL) return null;
-  if (trimmed.startsWith("http")) return trimmed;
-  const p = trimmed.replace(/^\/+/, "");
-  return `${uploadsBaseURL.replace(/\/+$/, "")}/${p}`;
-}
-
 // Live preview panel — shows current form data in a professional footer style
-function FooterPreview({ email, phone, address, socialLinks, uploadsBaseURL }) {
+function FooterPreview({ email, phone, address, socialLinks, buildUploadUrl }) {
   const hasAny =
     email || phone || address || (socialLinks && socialLinks.length > 0);
   const displayLinks = socialLinks?.filter((s) => s?.link?.trim()) || [];
@@ -48,7 +40,7 @@ function FooterPreview({ email, phone, address, socialLinks, uploadsBaseURL }) {
     if (link.iconFile && link.iconFile instanceof File) {
       return URL.createObjectURL(link.iconFile);
     }
-    return buildAssetUrl(link.icon, uploadsBaseURL);
+    return buildUploadUrl(link.icon);
   };
 
   return (
@@ -163,9 +155,6 @@ export default function FooterPage() {
   const navigate = useNavigate();
   const api = useApi();
   const apiBaseURL = import.meta.env.VITE_API_BASE_URL || "";
-  const uploadsBaseURL =
-    import.meta.env.VITE_UPLOADS_BASE_URL ||
-    apiBaseURL.replace(/\/api\/?$/, "");
 
   const [isAdmin, setIsAdmin] = useState(null);
   const [footer, setFooter] = useState(null);
@@ -555,7 +544,7 @@ export default function FooterPage() {
                                 </span>
                               ) : link.icon ? (
                                 <img
-                                  src={buildAssetUrl(link.icon, uploadsBaseURL)}
+                                  src={buildUploadUrl(link.icon)}
                                   alt=""
                                   className="h-7 w-7 rounded object-contain border border-border"
                                 />
@@ -619,7 +608,7 @@ export default function FooterPage() {
                 phone={phone}
                 address={address}
                 socialLinks={socialLinks}
-                uploadsBaseURL={uploadsBaseURL}
+                buildUploadUrl={buildUploadUrl}
               />
             </div>
           </div>

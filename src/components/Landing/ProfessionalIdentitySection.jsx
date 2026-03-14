@@ -3,26 +3,9 @@ import { Link } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import { ChevronLeft, ChevronRight, GraduationCap } from "lucide-react";
 import { getWebsiteConfig } from "../../lib/websiteConfig";
+import { buildUploadUrl } from "../../lib/uploadUrl";
 
 const apiBaseURL = import.meta.env.VITE_API_BASE_URL || "";
-const uploadsBaseURL =
-  import.meta.env.VITE_UPLOADS_BASE_URL ||
-  apiBaseURL.replace(/\/api\/?$/, "").replace(/\/$/, "") ||
-  "";
-
-function buildImageUrl(image) {
-  if (!image || typeof image !== "string") return null;
-  if (image.startsWith("http://") || image.startsWith("https://")) return image;
-  const path = image.startsWith("/") ? image.slice(1) : image;
-  const base = uploadsBaseURL
-    ? uploadsBaseURL.endsWith("/")
-      ? uploadsBaseURL.slice(0, -1)
-      : uploadsBaseURL
-    : typeof window !== "undefined"
-      ? window.location.origin
-      : "";
-  return base ? `${base}/${path}` : `/${path}`;
-}
 
 const AUTO_SLIDE_INTERVAL = 5000;
 
@@ -63,7 +46,7 @@ export default function ProfessionalIdentitySection() {
   }, []);
 
   const slide = sliders[activeIndex];
-  const imageUrl = slide?.image ? buildImageUrl(slide.image) : null;
+  const imageUrl = slide?.image ? buildUploadUrl(slide.image) : null;
   const showFallbackImg = !imageUrl || imgError;
 
   const goPrev = useCallback(() => {
@@ -192,7 +175,7 @@ export default function ProfessionalIdentitySection() {
                     style={{ marginBottom: 0 }}
                   >
                     <img
-                      src={buildImageUrl(slide.icon)}
+                      src={buildUploadUrl(slide.icon)}
                       alt=""
                       className="w-full h-full object-contain p-1"
                     />
@@ -228,7 +211,7 @@ export default function ProfessionalIdentitySection() {
                     className="shrink-0 w-24 h-36 md:w-28 md:h-40 rounded-lg overflow-hidden flex items-center justify-center"
                   >
                     <img
-                      src={buildImageUrl(img)}
+                      src={buildUploadUrl(img)}
                       alt=""
                       className="w-full h-full object-contain"
                     />

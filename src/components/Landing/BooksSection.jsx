@@ -4,38 +4,9 @@ import FlipPageReader from "../Books/FlipPageReader";
 import { getWebsiteConfig, isSectionEnabled } from "../../lib/websiteConfig";
 import { Toaster, toast } from "react-hot-toast";
 import SubscribeToReadModal from "./SubscribeToReadModal";
+import { buildUploadUrl } from "../../lib/uploadUrl";
 
 const apiBaseURL = import.meta.env.VITE_API_BASE_URL || "";
-const uploadsBaseURL =
-  import.meta.env.VITE_UPLOADS_BASE_URL ||
-  apiBaseURL.replace(/\/api\/?$/, "").replace(/\/$/, "") ||
-  "";
-
-function buildImageUrl(image) {
-  if (!image || typeof image !== "string") return null;
-  if (image.startsWith("http://") || image.startsWith("https://")) return image;
-  const path = image.startsWith("/") ? image.slice(1) : image;
-  if (!path) return null;
-  const base = uploadsBaseURL
-    ? uploadsBaseURL.endsWith("/")
-      ? uploadsBaseURL.slice(0, -1)
-      : uploadsBaseURL
-    : typeof window !== "undefined"
-      ? window.location.origin
-      : "";
-  return base ? `${base}/${path}` : `/${path}`;
-}
-
-function buildAssetUrl(path) {
-  if (!path || typeof path !== "string") return null;
-  const p = path.replace(/^\/+/, "");
-  if (!p) return null;
-  if (path.startsWith("http")) return path;
-  const base =
-    uploadsBaseURL ||
-    (typeof window !== "undefined" ? window.location.origin : "");
-  return base ? `${base.replace(/\/+$/, "")}/${p}` : `/${p}`;
-}
 
 export default function BooksSection() {
   const [books, setBooks] = useState([]);
@@ -133,7 +104,7 @@ export default function BooksSection() {
       if (res.ok && json?.success && json?.data?.bookUrl) {
         const bookUrl = json.data.bookUrl;
         const fullUrl =
-          buildAssetUrl(bookUrl) ||
+          buildUploadUrl(bookUrl) ||
           (bookUrl.startsWith("/")
             ? `${window.location.origin}${bookUrl}`
             : bookUrl);
@@ -265,7 +236,7 @@ export default function BooksSection() {
           {/* Books grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 md:gap-10">
             {books.map((book, index) => {
-              const coverUrl = buildImageUrl(book?.coverImage || book?.coverimage);
+              const coverUrl = buildUploadUrl(book?.coverImage || book?.coverimage);
               const isPaid = book?.isPaid === true || book?.isPaid === "true";
               const bookId = book._id || book.id;
               const showCover = coverUrl && !imgErrors.has(bookId);

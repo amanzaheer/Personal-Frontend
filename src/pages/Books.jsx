@@ -21,6 +21,7 @@ import {
   Eye,
 } from "lucide-react";
 import { useFormatDate } from "../lib/dateUtils";
+import { buildUploadUrl } from "../lib/uploadUrl";
 
 export default function Books() {
   const navigate = useNavigate();
@@ -37,9 +38,6 @@ export default function Books() {
   const api = useApi();
   const { formatDate: formatDateWithTimezone } = useFormatDate();
   const apiBaseURL = import.meta.env.VITE_API_BASE_URL || "";
-  const uploadsBaseURL =
-    import.meta.env.VITE_UPLOADS_BASE_URL ||
-    apiBaseURL.replace(/\/api\/?$/, "");
   const fetchInProgressRef = useRef(false);
 
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -289,12 +287,7 @@ export default function Books() {
     setCoverImageFile(null);
     const coverPath = book.coverImage || book.coverimage;
     if (coverPath && coverPath.trim()) {
-      const imgUrl = coverPath.startsWith("http")
-        ? coverPath
-        : uploadsBaseURL
-          ? `${uploadsBaseURL.replace(/\/+$/, "")}/${coverPath.replace(/^\/+/, "")}`
-          : `/${coverPath.replace(/^\/+/, "")}`;
-      setCoverImagePreview(imgUrl);
+      setCoverImagePreview(buildUploadUrl(coverPath) || coverPath);
     } else {
       setCoverImagePreview(null);
     }
@@ -396,22 +389,10 @@ export default function Books() {
     );
   };
 
-  const buildAssetUrl = (path) => {
-    if (!path || typeof path !== "string") return null;
-    const trimmed = path.trim();
-    if (!trimmed) return null;
-    if (trimmed.startsWith("http")) return trimmed;
-    const p = trimmed.replace(/^\/+/, "");
-    if (!p) return null;
-    return uploadsBaseURL
-      ? `${uploadsBaseURL.replace(/\/+$/, "")}/${p}`
-      : `/${p}`;
-  };
-
   const getCoverImageUrl = (book) =>
-    buildAssetUrl(book?.coverImage || book?.coverimage);
+    buildUploadUrl(book?.coverImage || book?.coverimage);
   const getBookFileUrl = (book) =>
-    buildAssetUrl(book?.bookFile || book?.bookfile);
+    buildUploadUrl(book?.bookFile || book?.bookfile);
 
   const openViewModal = (book) => {
     setBookToView(book);

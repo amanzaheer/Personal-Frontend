@@ -18,6 +18,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { useFormatDate } from "../lib/dateUtils";
+import { buildUploadUrl } from "../lib/uploadUrl";
 
 const STATUS_OPTIONS = ["active", "inactive"];
 
@@ -34,9 +35,6 @@ export default function Sliders() {
   const api = useApi();
   const { formatDate: formatDateWithTimezone } = useFormatDate();
   const apiBaseURL = import.meta.env.VITE_API_BASE_URL || "";
-  const uploadsBaseURL =
-    import.meta.env.VITE_UPLOADS_BASE_URL ||
-    apiBaseURL.replace(/\/api\/?$/, "");
   const fetchInProgressRef = useRef(false);
 
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -277,42 +275,21 @@ export default function Sliders() {
     setImageFile(null);
     const imgPath = slider.image;
     if (imgPath && imgPath.trim()) {
-      const imgUrl = imgPath.startsWith("http")
-        ? imgPath
-        : uploadsBaseURL
-          ? `${uploadsBaseURL.replace(/\/+$/, "")}/${imgPath.replace(/^\/+/, "")}`
-          : `/${imgPath.replace(/^\/+/, "")}`;
-      setImagePreview(imgUrl);
+      setImagePreview(buildUploadUrl(imgPath) || imgPath);
     } else {
       setImagePreview(null);
     }
     setIconFile(null);
     const iconPath = slider.icon;
     if (iconPath && iconPath.trim()) {
-      const iconUrl = iconPath.startsWith("http")
-        ? iconPath
-        : uploadsBaseURL
-          ? `${uploadsBaseURL.replace(/\/+$/, "")}/${iconPath.replace(/^\/+/, "")}`
-          : `/${iconPath.replace(/^\/+/, "")}`;
-      setIconPreview(iconUrl);
+      setIconPreview(buildUploadUrl(iconPath) || iconPath);
     } else {
       setIconPreview(null);
     }
     setImagesFiles([]);
     const imgs = Array.isArray(slider.images) ? slider.images : [];
     if (imgs.length > 0) {
-      const urls = imgs
-        .map((p) =>
-          p && p.trim()
-            ? p.startsWith("http")
-              ? p
-              : uploadsBaseURL
-                ? `${uploadsBaseURL.replace(/\/+$/, "")}/${p.replace(/^\/+/, "")}`
-                : `/${p.replace(/^\/+/, "")}`
-            : null
-        )
-        .filter(Boolean);
-      setImagesPreviews(urls);
+      setImagesPreviews(imgs.map((p) => buildUploadUrl(p)).filter(Boolean));
     } else {
       setImagesPreviews([]);
     }
@@ -442,24 +419,12 @@ export default function Sliders() {
     );
   };
 
-  const buildAssetUrl = (path) => {
-    if (!path || typeof path !== "string") return null;
-    const trimmed = path.trim();
-    if (!trimmed) return null;
-    if (trimmed.startsWith("http")) return trimmed;
-    const p = trimmed.replace(/^\/+/, "");
-    if (!p) return null;
-    return uploadsBaseURL
-      ? `${uploadsBaseURL.replace(/\/+$/, "")}/${p}`
-      : `/${p}`;
-  };
-
-  const getImageUrl = (slider) => buildAssetUrl(slider?.image);
-  const getIconUrl = (slider) => buildAssetUrl(slider?.icon);
+  const getImageUrl = (slider) => buildUploadUrl(slider?.image);
+  const getIconUrl = (slider) => buildUploadUrl(slider?.icon);
   const getImagesUrls = (slider) => {
     const arr = slider?.images;
     if (!Array.isArray(arr)) return [];
-    return arr.map((p) => buildAssetUrl(p)).filter(Boolean);
+    return arr.map((p) => buildUploadUrl(p)).filter(Boolean);
   };
 
   const renderActions = (sliderId) => {

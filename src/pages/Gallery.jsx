@@ -19,6 +19,7 @@ import {
   Eye,
 } from "lucide-react";
 import { useFormatDate } from "../lib/dateUtils";
+import { buildUploadUrl } from "../lib/uploadUrl";
 
 export default function Gallery() {
   const navigate = useNavigate();
@@ -35,9 +36,6 @@ export default function Gallery() {
   const api = useApi();
   const { formatDate: formatDateWithTimezone } = useFormatDate();
   const apiBaseURL = import.meta.env.VITE_API_BASE_URL || "";
-  const uploadsBaseURL =
-    import.meta.env.VITE_UPLOADS_BASE_URL ||
-    apiBaseURL.replace(/\/api\/?$/, "");
   const fetchInProgressRef = useRef(false);
 
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -283,12 +281,7 @@ export default function Gallery() {
     setImageFile(null);
     const imgPath = item.image;
     if (imgPath && imgPath.trim()) {
-      const imgUrl = imgPath.startsWith("http")
-        ? imgPath
-        : uploadsBaseURL
-          ? `${uploadsBaseURL.replace(/\/+$/, "")}/${imgPath.replace(/^\/+/, "")}`
-          : `/${imgPath.replace(/^\/+/, "")}`;
-      setImagePreview(imgUrl);
+      setImagePreview(buildUploadUrl(imgPath) || imgPath);
     } else {
       setImagePreview(null);
     }
@@ -353,19 +346,7 @@ export default function Gallery() {
     });
   };
 
-  const buildAssetUrl = (path) => {
-    if (!path || typeof path !== "string") return null;
-    const trimmed = path.trim();
-    if (!trimmed) return null;
-    if (trimmed.startsWith("http")) return trimmed;
-    const p = trimmed.replace(/^\/+/, "");
-    if (!p) return null;
-    return uploadsBaseURL
-      ? `${uploadsBaseURL.replace(/\/+$/, "")}/${p}`
-      : `/${p}`;
-  };
-
-  const getImageUrl = (item) => buildAssetUrl(item?.image);
+  const getImageUrl = (item) => buildUploadUrl(item?.image);
 
   const openViewModal = (item) => {
     setItemToView(item);

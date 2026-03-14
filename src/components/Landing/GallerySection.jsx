@@ -1,26 +1,9 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { ChevronLeft, ChevronRight, ImageIcon, Sparkles } from "lucide-react";
 import { getWebsiteConfig, isSectionEnabled } from "../../lib/websiteConfig";
+import { buildUploadUrl } from "../../lib/uploadUrl";
 
 const apiBaseURL = import.meta.env.VITE_API_BASE_URL || "";
-const uploadsBaseURL =
-  import.meta.env.VITE_UPLOADS_BASE_URL ||
-  apiBaseURL.replace(/\/api\/?$/, "").replace(/\/$/, "") ||
-  "";
-
-function buildImageUrl(image) {
-  if (!image || typeof image !== "string") return null;
-  if (image.startsWith("http://") || image.startsWith("https://")) return image;
-  const path = image.startsWith("/") ? image.slice(1) : image;
-  const base = uploadsBaseURL
-    ? uploadsBaseURL.endsWith("/")
-      ? uploadsBaseURL.slice(0, -1)
-      : uploadsBaseURL
-    : typeof window !== "undefined"
-      ? window.location.origin
-      : "";
-  return base ? `${base}/${path}` : `/${path}`;
-}
 
 const AUTO_SLIDE_INTERVAL = 6000;
 const VISIBLE_COUNT = 5;
@@ -109,7 +92,7 @@ export default function GallerySection() {
   if (!items.length) return null;
 
   const active = items[activeIndex];
-  const imageUrl = active?.image ? buildImageUrl(active.image) : null;
+  const imageUrl = active?.image ? buildUploadUrl(active.image) : null;
   const showFallback = !imageUrl || imgErrors.has(active?._id || active?.id);
 
   const total = items.length;
@@ -308,7 +291,7 @@ export default function GallerySection() {
                   {visibleItems.map((item, idx) => {
                     const globalIndex = start + idx;
                     const thumbUrl = item?.image
-                      ? buildImageUrl(item.image)
+                      ? buildUploadUrl(item.image)
                       : null;
                     const isActive = globalIndex === activeIndex;
                     return (
