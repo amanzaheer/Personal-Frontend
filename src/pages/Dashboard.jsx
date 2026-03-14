@@ -23,6 +23,7 @@ import {
   TrendingUp,
   PenLine,
   ChevronRight,
+  Footprints,
 } from "lucide-react";
 import useApi from "../lib/useApi";
 
@@ -242,6 +243,21 @@ export default function Dashboard() {
                 <p className="font-medium text-foreground">Gallery</p>
                 <p className="text-sm text-muted-foreground">
                   Manage images and media
+                </p>
+              </div>
+              <ChevronRight className="w-5 h-5 text-muted-foreground ml-auto" />
+            </Link>
+            <Link
+              to="/footer"
+              className="flex items-center gap-4 p-4 rounded-xl border border-border bg-card hover:bg-accent/5 hover:border-accent/30 transition-all"
+            >
+              <div className="p-2 rounded-lg bg-accent/10">
+                <Footprints className="w-5 h-5 text-accent" />
+              </div>
+              <div>
+                <p className="font-medium text-foreground">Footer</p>
+                <p className="text-sm text-muted-foreground">
+                  Contact info and social links
                 </p>
               </div>
               <ChevronRight className="w-5 h-5 text-muted-foreground ml-auto" />

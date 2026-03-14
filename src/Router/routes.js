@@ -9,6 +9,7 @@ import { MembershipPage } from "../pages/Placeholder";
 import Sliders from "../pages/Sliders";
 import Books from "../pages/Books";
 import Gallery from "../pages/Gallery";
+import Footer from "../pages/Footer";
 import Payments from "../pages/Payments";
 import BookSubscription from "../pages/BookSubscription";
 
@@ -67,6 +68,12 @@ export const routes = [
     element: Gallery,
     permission: "",
     pageTitle: "Gallery",
+  },
+  {
+    path: "/footer",
+    element: Footer,
+    permission: "",
+    pageTitle: "Footer",
   },
   {
     path: "/settings",

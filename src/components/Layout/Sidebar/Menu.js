@@ -7,6 +7,7 @@ import {
   LayoutGrid,
   Wallet,
   LayoutDashboard,
+  Footprints,
 } from "lucide-react";
 
 export const menu = [
@@ -42,6 +43,13 @@ export const menu = [
     Icon: ImageIcon,
     title: "Gallery",
     to: "/gallery",
+    permission: "",
+    disabled: false,
+  },
+  {
+    Icon: Footprints,
+    title: "Footer",
+    to: "/footer",
     permission: "",
     disabled: false,
   },
