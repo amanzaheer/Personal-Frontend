@@ -6,6 +6,7 @@ import HomeBanner from "../components/Landing/HomeBanner";
 import ProfessionalIdentitySection from "../components/Landing/ProfessionalIdentitySection";
 import BooksSection from "../components/Landing/BooksSection";
 import GallerySection from "../components/Landing/GallerySection";
+import LandingFooter from "../components/Landing/LandingFooter";
 
 const stripePublicKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || "";
 const stripePromise = stripePublicKey ? loadStripe(stripePublicKey) : null;
@@ -19,6 +20,7 @@ export default function LandingPage() {
         <ProfessionalIdentitySection />
         <BooksSection />
         <GallerySection />
+        <LandingFooter />
       </div>
     </Elements>
   );
