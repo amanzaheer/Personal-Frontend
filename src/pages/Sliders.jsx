@@ -279,9 +279,9 @@ export default function Sliders() {
     if (imgPath && imgPath.trim()) {
       const imgUrl = imgPath.startsWith("http")
         ? imgPath
-        : import.meta.env.DEV
-          ? `/${imgPath.replace(/^\/+/, "")}`
-          : `${uploadsBaseURL.replace(/\/+$/, "")}/${imgPath.replace(/^\/+/, "")}`;
+        : uploadsBaseURL
+          ? `${uploadsBaseURL.replace(/\/+$/, "")}/${imgPath.replace(/^\/+/, "")}`
+          : `/${imgPath.replace(/^\/+/, "")}`;
       setImagePreview(imgUrl);
     } else {
       setImagePreview(null);
@@ -291,9 +291,9 @@ export default function Sliders() {
     if (iconPath && iconPath.trim()) {
       const iconUrl = iconPath.startsWith("http")
         ? iconPath
-        : import.meta.env.DEV
-          ? `/${iconPath.replace(/^\/+/, "")}`
-          : `${uploadsBaseURL.replace(/\/+$/, "")}/${iconPath.replace(/^\/+/, "")}`;
+        : uploadsBaseURL
+          ? `${uploadsBaseURL.replace(/\/+$/, "")}/${iconPath.replace(/^\/+/, "")}`
+          : `/${iconPath.replace(/^\/+/, "")}`;
       setIconPreview(iconUrl);
     } else {
       setIconPreview(null);
@@ -306,9 +306,9 @@ export default function Sliders() {
           p && p.trim()
             ? p.startsWith("http")
               ? p
-              : import.meta.env.DEV
-                ? `/${p.replace(/^\/+/, "")}`
-                : `${uploadsBaseURL.replace(/\/+$/, "")}/${p.replace(/^\/+/, "")}`
+              : uploadsBaseURL
+                ? `${uploadsBaseURL.replace(/\/+$/, "")}/${p.replace(/^\/+/, "")}`
+                : `/${p.replace(/^\/+/, "")}`
             : null
         )
         .filter(Boolean);
@@ -449,9 +449,9 @@ export default function Sliders() {
     if (trimmed.startsWith("http")) return trimmed;
     const p = trimmed.replace(/^\/+/, "");
     if (!p) return null;
-    return import.meta.env.DEV
-      ? `/${p}`
-      : `${uploadsBaseURL.replace(/\/+$/, "")}/${p}`;
+    return uploadsBaseURL
+      ? `${uploadsBaseURL.replace(/\/+$/, "")}/${p}`
+      : `/${p}`;
   };
 
   const getImageUrl = (slider) => buildAssetUrl(slider?.image);

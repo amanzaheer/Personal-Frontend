@@ -291,9 +291,9 @@ export default function Books() {
     if (coverPath && coverPath.trim()) {
       const imgUrl = coverPath.startsWith("http")
         ? coverPath
-        : import.meta.env.DEV
-          ? `/${coverPath.replace(/^\/+/, "")}`
-          : `${uploadsBaseURL.replace(/\/+$/, "")}/${coverPath.replace(/^\/+/, "")}`;
+        : uploadsBaseURL
+          ? `${uploadsBaseURL.replace(/\/+$/, "")}/${coverPath.replace(/^\/+/, "")}`
+          : `/${coverPath.replace(/^\/+/, "")}`;
       setCoverImagePreview(imgUrl);
     } else {
       setCoverImagePreview(null);
@@ -403,9 +403,9 @@ export default function Books() {
     if (trimmed.startsWith("http")) return trimmed;
     const p = trimmed.replace(/^\/+/, "");
     if (!p) return null;
-    return import.meta.env.DEV
-      ? `/${p}`
-      : `${uploadsBaseURL.replace(/\/+$/, "")}/${p}`;
+    return uploadsBaseURL
+      ? `${uploadsBaseURL.replace(/\/+$/, "")}/${p}`
+      : `/${p}`;
   };
 
   const getCoverImageUrl = (book) => buildAssetUrl(book?.coverImage);

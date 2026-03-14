@@ -285,12 +285,9 @@ export default function Gallery() {
     if (imgPath && imgPath.trim()) {
       const imgUrl = imgPath.startsWith("http")
         ? imgPath
-        : import.meta.env.DEV
-          ? `/${imgPath.replace(/^\/+/, "")}`
-          : `${uploadsBaseURL.replace(/\/+$/, "")}/${imgPath.replace(
-              /^\/+/,
-              "",
-            )}`;
+        : uploadsBaseURL
+          ? `${uploadsBaseURL.replace(/\/+$/, "")}/${imgPath.replace(/^\/+/, "")}`
+          : `/${imgPath.replace(/^\/+/, "")}`;
       setImagePreview(imgUrl);
     } else {
       setImagePreview(null);
@@ -363,9 +360,9 @@ export default function Gallery() {
     if (trimmed.startsWith("http")) return trimmed;
     const p = trimmed.replace(/^\/+/, "");
     if (!p) return null;
-    return import.meta.env.DEV
-      ? `/${p}`
-      : `${uploadsBaseURL.replace(/\/+$/, "")}/${p}`;
+    return uploadsBaseURL
+      ? `${uploadsBaseURL.replace(/\/+$/, "")}/${p}`
+      : `/${p}`;
   };
 
   const getImageUrl = (item) => buildAssetUrl(item?.image);
