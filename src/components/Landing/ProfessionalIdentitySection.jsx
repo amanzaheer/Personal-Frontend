@@ -84,7 +84,7 @@ export default function ProfessionalIdentitySection() {
 
   if (loading) {
     return (
-      <section className="py-16 md:py-24 px-6 bg-white">
+      <section className="relative z-10 py-16 md:py-24 px-6 ">
         <div className="max-w-7xl mx-auto flex items-center justify-center min-h-[400px]">
           <div
             className="w-10 h-10 rounded-full border-2 border-t-transparent animate-spin"
@@ -103,9 +103,9 @@ export default function ProfessionalIdentitySection() {
   return (
     <section
       id="professional-identity-section"
-      className="pb-20 md:pb-28 px-6 relative overflow-hidden pro-identity-section-fade-in"
+      className="relative z-10  pb-20 md:pb-28 pt-16 md:pt-24 px-6 overflow-hidden pro-identity-section-fade-in"
     >
-      <div className="max-w-7xl mx-auto relative z-10">
+      <div className="max-w-7xl mx-auto relative">
         {/* Section heading – centered with decorative lines */}
         <div className="flex items-center justify-center gap-6 md:gap-8 mb-16 md:mb-20">
           <div className="hidden sm:flex items-center flex-1 max-w-[140px] md:max-w-[200px]">
@@ -121,6 +121,7 @@ export default function ProfessionalIdentitySection() {
             />
           </div>
           <h2
+            push
             className="pro-identity-title-bounce text-2xl md:text-3xl lg:text-4xl font-extrabold tracking-tight italic text-center px-4"
             style={{
               color: primaryColor,
@@ -143,11 +144,12 @@ export default function ProfessionalIdentitySection() {
             />
           </div>
         </div>
-        <div className="grid lg:grid-cols-2 gap-14 lg:gap-20 items-start min-h-[700px] lg:min-h-[780px]">
-          {/* Left: Title, bullets, section number */}
+        {/* Fixed height on mobile/tablet sized for largest slider so all content + images show; no jump when switching */}
+        <div className="grid grid-cols-1 grid-rows-[auto_1fr] lg:grid-cols-2 lg:grid-rows-none gap-14 lg:gap-20 items-start h-[1400px] sm:h-[1500px] lg:h-auto lg:min-h-[780px]">
+          {/* Left: Title, bullets, images, button – scrollable only if content exceeds space */}
           <div
             key={activeIndex}
-            className={`order-2 lg:order-1 ${
+            className={`order-2 lg:order-1 min-h-0 overflow-y-auto overflow-x-hidden lg:overflow-visible pr-1 lg:pr-0 ${
               slideDirection === "next"
                 ? "pro-identity-slide-enter"
                 : "pro-identity-slide-enter-prev"
@@ -233,10 +235,10 @@ export default function ProfessionalIdentitySection() {
             </div>
           </div>
 
-          {/* Right: Portrait */}
+          {/* Right: Portrait – fixed-size row on mobile so grid height stays constant */}
           <div
             key={`img-${activeIndex}`}
-            className="order-1 lg:order-2 relative pro-identity-image-wrap pro-identity-image-fade-in"
+            className="order-1 lg:order-2 relative pro-identity-image-wrap pro-identity-image-fade-in min-h-0"
           >
             <div className="relative flex justify-center lg:justify-end">
               <div className="relative w-full max-w-md">

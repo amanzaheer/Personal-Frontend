@@ -83,7 +83,7 @@ export default function LandingHeader() {
             <img
               src="/img/logoaisha.png"
               alt={siteName}
-              className="h-20 w-auto"
+              className=" h-12 lg:h-20 w-auto"
             />
           </Link>
 

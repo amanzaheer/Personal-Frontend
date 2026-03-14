@@ -42,11 +42,20 @@ export default function HomeBanner() {
 
   const skillsRef = useRef(null);
   const [skillsInView, setSkillsInView] = useState(true);
+  const [isLargeScreen, setIsLargeScreen] = useState(false);
 
   useEffect(() => {
     const handler = () => setConfig(getWebsiteConfig());
     window.addEventListener("website-config-changed", handler);
     return () => window.removeEventListener("website-config-changed", handler);
+  }, []);
+
+  useEffect(() => {
+    const mql = window.matchMedia("(min-width: 1024px)");
+    setIsLargeScreen(mql.matches);
+    const onChange = (e) => setIsLargeScreen(e.matches);
+    mql.addEventListener("change", onChange);
+    return () => mql.removeEventListener("change", onChange);
   }, []);
 
   useEffect(() => {
@@ -59,6 +68,15 @@ export default function HomeBanner() {
     obs.observe(el);
     return () => obs.disconnect();
   }, []);
+
+  // Mobile: full circle (360°). Large: right semicircle only (180°).
+  const getSkillAngle = (i, n) => {
+    const t = n > 0 ? i / n : 0;
+    if (isLargeScreen) {
+      return -Math.PI / 2 + t * Math.PI;
+    }
+    return -Math.PI / 2 + t * 2 * Math.PI;
+  };
 
   return (
     <div
@@ -82,18 +100,18 @@ export default function HomeBanner() {
         }}
       />
 
-      <main className="flex-1 relative z-10 pt-12 pb-8 px-6">
+      <main className="flex-1 relative z-10 pt-28 sm:pt-32 md:pt-28 lg:pt-24 pb-8 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center min-h-[calc(100vh-6rem)]">
+          <div className="grid lg:grid-cols-2 gap-8 sm:gap-10 lg:gap-16 items-center min-h-0 lg:min-h-[calc(100vh-6rem)]">
             <div className="order-2 lg:order-1 flex flex-col justify-center">
               <p
-                className="text-gray-800 text-lg font-medium mb-1 italic"
+                className="text-gray-800 text-base sm:text-lg font-medium mb-1 italic"
                 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
               >
                 {hero.greeting}
               </p>
               <h1
-                className="hero-name-animate text-4xl md:text-5xl font-serif font-bold mb-6 tracking-tight italic inline-block"
+                className="hero-name-animate text-3xl sm:text-4xl md:text-5xl font-serif font-bold mb-4 sm:mb-6 tracking-tight italic inline-block"
                 style={{
                   color: primaryColor,
                   fontFamily: "'Cormorant Garamond', Georgia, serif",
@@ -102,18 +120,18 @@ export default function HomeBanner() {
               >
                 {hero.name}
               </h1>
-              <div className="flex items-start gap-3 mb-6">
+              <div className="flex items-start gap-2 sm:gap-3 mb-4 sm:mb-6">
                 <span
-                  className="w-8 h-0.5 mt-2.5 flex-shrink-0"
+                  className="w-6 sm:w-8 h-0.5 mt-2 sm:mt-2.5 flex-shrink-0"
                   style={{ backgroundColor: primaryColor }}
                 />
-                <p className="text-gray-600 text-base leading-relaxed">
+                <p className="text-gray-600 text-sm sm:text-base leading-relaxed">
                   {hero.intro}
                 </p>
               </div>
               <Link
                 to={hero.ctaLink || "#"}
-                className="inline-flex items-center justify-center px-12 py-3.5 rounded-full min-w-[220px] text-white font-semibold shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all"
+                className="inline-flex items-center justify-center px-8 sm:px-12 py-3 sm:py-3.5 rounded-full min-w-[180px] sm:min-w-[220px] text-white text-sm sm:text-base font-semibold shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all"
                 style={{ backgroundColor: primaryColor, color: "#ffffff" }}
               >
                 {hero.ctaText}
@@ -122,12 +140,12 @@ export default function HomeBanner() {
 
             <div
               ref={skillsRef}
-              className={`skills-container order-1 lg:order-2 relative flex justify-center lg:justify-end ${skillsInView ? "skills-in-view" : ""}`}
+              className={`skills-container order-1 lg:order-2 relative flex justify-center lg:justify-end min-h-[240px] sm:min-h-[320px] lg:min-h-0 ${skillsInView ? "skills-in-view" : ""}`}
             >
-              <div className="relative w-full max-w-lg aspect-square">
-                {/* Central portrait - larger size, skills placed outside so they never overlap */}
+              <div className="relative w-full max-w-[260px] sm:max-w-xs md:max-w-sm lg:max-w-lg aspect-square">
+                {/* Central portrait - smaller on mobile, scales up on larger screens */}
                 <div className="absolute inset-0 flex items-center justify-center z-10">
-                  <div className="relative w-[22rem] h-[22rem] sm:w-[28rem] sm:h-[28rem] md:w-[88%] md:h-[88%] rounded-full overflow-hidden shadow-xl ring-4 ring-white">
+                  <div className="relative w-40 h-40 sm:w-72 sm:h-72 md:w-[22rem] md:h-[22rem] lg:w-[88%] lg:h-[88%] rounded-full overflow-hidden shadow-xl ring-2 sm:ring-4 ring-white">
                     {hero.heroImage ? (
                       <img
                         src={hero.heroImage}
@@ -148,18 +166,16 @@ export default function HomeBanner() {
                   <>
                     <div className="absolute inset-0 pointer-events-none">
                       {skills.map((skill, i) => {
-                        // Right semicircle only: top (-90°) → right (0°) → bottom (90°), left side stays clear
-                        // minRadius + gap ensure skills stay outside portrait (portrait ~40% from center)
                         const n = Math.max(skills.length - 1, 1);
-                        const baseAngle = -Math.PI / 2 + (i / n) * Math.PI;
-                        const minRadius = 56;
+                        const baseAngle = getSkillAngle(i, n);
+                        const minRadius = isLargeScreen ? 56 : 52;
                         const radius = minRadius + (i % 5) * 5 + ((i * 11) % 6);
                         const x = 50 + Math.cos(baseAngle) * radius;
                         const y = 50 + Math.sin(baseAngle) * radius * 0.82;
                         return (
                           <span
                             key={i}
-                            className="skill-tag-animate absolute text-sm font-medium text-black bg-white px-3 py-1.5 rounded-full border border-gray-300 whitespace-nowrap z-10"
+                            className="skill-tag-animate absolute text-xs sm:text-sm font-medium text-black bg-white px-2 py-1 sm:px-3 sm:py-1.5 rounded-full border border-gray-300 whitespace-nowrap z-10"
                             style={{
                               left: `${x}%`,
                               top: `${y}%`,
@@ -180,10 +196,10 @@ export default function HomeBanner() {
                     >
                       {skills.map((skill, i) => {
                         const n = Math.max(skills.length - 1, 1);
-                        const baseAngle = -Math.PI / 2 + (i / n) * Math.PI;
-                        const minRadius = 56;
+                        const baseAngle = getSkillAngle(i, n);
+                        const minRadius = isLargeScreen ? 56 : 52;
                         const radius = minRadius + (i % 5) * 5 + ((i * 11) % 6);
-                        const portraitRadius = 44;
+                        const portraitRadius = isLargeScreen ? 44 : 40;
                         const x1 = 50 + Math.cos(baseAngle) * portraitRadius;
                         const y1 =
                           50 + Math.sin(baseAngle) * portraitRadius * 0.82;
