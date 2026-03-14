@@ -8,10 +8,11 @@ pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.vers
 
 const PAGE_WIDTH = 400;
 const PAGE_HEIGHT = 560;
-const SCALE = 1.0; // Lower = faster, less memory
+const SCALE = 1.0;
 const JPEG_QUALITY = 0.8;
-const YIELD_MS = 16; // Yield to main thread between pages to keep UI responsive
-
+const YIELD_MS = 12;
+/** Open reader after this many pages are ready; rest load in background */
+const INITIAL_PAGES = 3;
 const delay = (ms) => new Promise((r) => setTimeout(r, ms));
 
 export default function FlipPageReader({ pdfUrl, title = "Book", onClose, onReady, embedded = false }) {
@@ -42,7 +43,7 @@ export default function FlipPageReader({ pdfUrl, title = "Book", onClose, onRead
       return canvas.toDataURL("image/jpeg", JPEG_QUALITY);
     };
 
-    const loadPdfToImages = async () => {
+    const run = async () => {
       setLoading(true);
       setError(null);
       try {
@@ -56,30 +57,46 @@ export default function FlipPageReader({ pdfUrl, title = "Book", onClose, onRead
 
         const numPages = pdf.numPages;
         setLoadingProgress({ current: 0, total: numPages });
-        const images = [];
+        const initialSlots = Array(numPages).fill(null);
 
-        for (let i = 1; i <= numPages; i++) {
+        const initialCount = Math.min(INITIAL_PAGES, numPages);
+        for (let i = 1; i <= initialCount; i++) {
           if (cancelled) return;
-          images.push(await loadPageToImage(pdf, i));
+          const dataUrl = await loadPageToImage(pdf, i);
+          if (cancelled) return;
+          initialSlots[i - 1] = dataUrl;
           setLoadingProgress({ current: i, total: numPages });
           await delay(YIELD_MS);
         }
 
-        if (!cancelled) setPageImages(images);
+        if (cancelled) return;
+        setPageImages(initialSlots);
+        setLoading(false);
+        onReady?.();
+
+        for (let i = initialCount + 1; i <= numPages; i++) {
+          if (cancelled) return;
+          const dataUrl = await loadPageToImage(pdf, i);
+          if (cancelled) return;
+          setPageImages((prev) => {
+            const next = [...prev];
+            next[i - 1] = dataUrl;
+            return next;
+          });
+          setLoadingProgress({ current: i, total: numPages });
+          await delay(YIELD_MS);
+        }
       } catch (err) {
         if (!cancelled) {
           setError(err?.message || "Failed to load PDF");
           setPageImages([]);
-        }
-      } finally {
-        if (!cancelled) {
           setLoading(false);
           onReady?.();
         }
       }
     };
 
-    loadPdfToImages();
+    run();
     return () => { cancelled = true; };
   }, [pdfUrl]);
 
@@ -101,11 +118,41 @@ export default function FlipPageReader({ pdfUrl, title = "Book", onClose, onRead
 
   const totalPages = pageImages.length;
   const currentDisplayPage = currentPage + 1;
+  const loadedCount = pageImages.filter(Boolean).length;
+  const stillLoading = totalPages > 0 && loadedCount < totalPages;
 
-  if (loading) {
-    // While the PDF is loading, we rely on the button-level loader in the books grid.
-    // Don't render an additional global loader above the books section.
-    return null;
+  if (loading && totalPages === 0) {
+    return (
+      <div
+        className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-stone-900/80 backdrop-blur-sm"
+        onClick={(e) => e.target === e.currentTarget && onClose?.()}
+        role="presentation"
+      >
+        <div
+          className="relative w-full max-w-md rounded-xl bg-[#faf7f2] dark:bg-stone-900 border border-stone-200 dark:border-stone-700 p-8 shadow-2xl text-center"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {onClose && (
+            <div className="absolute top-4 right-4">
+              <button
+                onClick={onClose}
+                className="p-2 rounded-full text-stone-500 hover:bg-stone-200 dark:hover:bg-stone-700"
+                aria-label="Cancel"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+          )}
+          <Loader2 className="w-12 h-12 mx-auto mb-4 text-stone-500 animate-spin" />
+          <p className="text-stone-700 dark:text-stone-300 font-medium">Opening book…</p>
+          {loadingProgress.total > 0 && (
+            <p className="text-sm text-stone-500 mt-1">
+              First pages loading… {loadingProgress.current}/{loadingProgress.total}
+            </p>
+          )}
+        </div>
+      </div>
+    );
   }
 
   if (error || totalPages === 0) {
@@ -168,41 +215,56 @@ export default function FlipPageReader({ pdfUrl, title = "Book", onClose, onRead
                 boxSizing: "border-box",
               }}
             >
-              <img
-                src={img}
-                alt={`Page ${i + 1}`}
-                style={{
-                  maxWidth: "100%",
-                  maxHeight: "100%",
-                  objectFit: "contain",
-                }}
-              />
+              {img ? (
+                <img
+                  src={img}
+                  alt={`Page ${i + 1}`}
+                  style={{
+                    maxWidth: "100%",
+                    maxHeight: "100%",
+                    objectFit: "contain",
+                  }}
+                />
+              ) : (
+                <div className="flex flex-col items-center justify-center gap-2 text-stone-400">
+                  <Loader2 className="w-8 h-8 animate-spin" />
+                  <span className="text-xs font-medium">Loading page {i + 1}…</span>
+                </div>
+              )}
             </div>
           ))}
         </HTMLFlipBook>
       </div>
 
       {/* Controls */}
-      <div className="flex items-center gap-4">
-        <button
-          onClick={flipPrev}
-          disabled={currentPage <= 0}
-          className="p-2.5 rounded-lg border border-stone-300/80 dark:border-stone-600/60 bg-white dark:bg-stone-800/50 hover:bg-stone-50 dark:hover:bg-stone-700/50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition-colors"
-          title="Previous page"
-        >
-          <ChevronLeft className="w-5 h-5 text-stone-600 dark:text-stone-400" />
-        </button>
-        <span className="text-sm text-stone-600 dark:text-stone-400 min-w-[80px] text-center font-medium">
-          {currentDisplayPage} / {totalPages}
-        </span>
-        <button
-          onClick={flipNext}
-          disabled={currentPage >= totalPages - 1}
-          className="p-2.5 rounded-lg border border-stone-300/80 dark:border-stone-600/60 bg-white dark:bg-stone-800/50 hover:bg-stone-50 dark:hover:bg-stone-700/50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition-colors"
-          title="Next page"
-        >
-          <ChevronRight className="w-5 h-5 text-stone-600 dark:text-stone-400" />
-        </button>
+      <div className="flex flex-col items-center gap-2">
+        <div className="flex items-center gap-4">
+          <button
+            onClick={flipPrev}
+            disabled={currentPage <= 0}
+            className="p-2.5 rounded-lg border border-stone-300/80 dark:border-stone-600/60 bg-white dark:bg-stone-800/50 hover:bg-stone-50 dark:hover:bg-stone-700/50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition-colors"
+            title="Previous page"
+          >
+            <ChevronLeft className="w-5 h-5 text-stone-600 dark:text-stone-400" />
+          </button>
+          <span className="text-sm text-stone-600 dark:text-stone-400 min-w-[80px] text-center font-medium">
+            {currentDisplayPage} / {totalPages}
+          </span>
+          <button
+            onClick={flipNext}
+            disabled={currentPage >= totalPages - 1}
+            className="p-2.5 rounded-lg border border-stone-300/80 dark:border-stone-600/60 bg-white dark:bg-stone-800/50 hover:bg-stone-50 dark:hover:bg-stone-700/50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition-colors"
+            title="Next page"
+          >
+            <ChevronRight className="w-5 h-5 text-stone-600 dark:text-stone-400" />
+          </button>
+        </div>
+        {stillLoading && (
+          <p className="text-xs text-stone-500 dark:text-stone-400 flex items-center gap-1.5">
+            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            Loading remaining pages… {loadedCount}/{totalPages}
+          </p>
+        )}
       </div>
     </div>
   );
